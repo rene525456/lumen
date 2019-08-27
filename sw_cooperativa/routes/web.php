@@ -24,6 +24,8 @@ $router->group(['prefix' => 'cliente'], function($router){
 	$router->get('get/{cedula}','ClienteController@getCliente');
 	$router->get('cuentas/{cedula}','ClienteController@getCuentas');
 	$router->get('cuenta/{numero}','ClienteController@getCuenta');
+	$router->post('transaccion','ClienteController@realizarTransaccion');
+	$router->get('getPrueba/{cedula}','ClienteController@getClientePrueba');
 	
 	//$router->post('users','UserController@login');
 });
