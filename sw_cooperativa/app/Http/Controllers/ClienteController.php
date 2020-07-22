@@ -1,132 +1,75 @@
 <?php
+
 namespace App\Http\Controllers;
 use Illuminate\Http\Request;
-
 use App\Cliente;
-use App\Cuenta;
-use App\Transaccion;
 use DB;
-use App\Http\Helper\ResponseBuilder;
 
-
-class ClienteController extends Controller
-{
+class ClienteController extends Controller{
+    
     public function __construct(){
-
+        //
     }
 
-    public function getCliente(Request $request, $cedula){
-        if($request->json()){
-            //$cliente = Cliente::find($cedula);
-            $cliente = Cliente::where('cedula',$cedula)->get();
-            if(!$cliente->isEmpty()){
-                $status = true;
-                $info  = "Data is listed successfully";
-            }else{
-                $status = false;
-                $info  = "Data is not listed successfully";
-            }
-            return ResponseBuilder::result($status, $info,$cliente);
-        }else{
-            $status = false;
-            $info  = "Unauthorized";
+    public function all(Request $request){
+        $clientes = Cliente::all();
+        return response()->json($clientes,200);
+    }
+
+    public function allJson(Request $request){
+        if($request->isJson()){
+            $clientes = Cliente::all();
+            return response()->json($clientes,200);
         }
-        return ResponseBuilder::result($status, $info);
+        return response()->json(['error'=>'Unauthorized'],401,[]);
     }
 
-    public function getClientePrueba(Request $request, $cedula){
-            $cliente = Cliente::where('cedula',$cedula)->get();
+    public function getClienteCedula(Request $request, $cedula){
+        if($request->isJson()){
+            $cliente = Cliente::where('cedula', $cedula)->get();
             if(!$cliente->isEmpty()){
-                $status = true;
-                $info  = "Data is listed successfully";
+                return response()->json($cliente,200);
             }else{
-                $status = false;
-                $info  = "Data is not listed successfully";
+                return response()->json(['error'=>'No existe el cliente'],401,[]);
             }
-            return ResponseBuilder::result($status, $info,$cliente);
+        }
+        return response()->json(['error'=>'Unauthorized'],401,[]);
     }
 
     public function getCuentas(Request $request, $cedula){
-        if($request->json()){
-            $cuenta = DB::select("select * from modelo_cuenta where cliente_id = (select cliente_id from modelo_cliente where cedula = ". $cedula .")");
-            if($cuenta != null){
-                $status = false;
-                $info  = "Data is listed successfully";
-            }else{
-                $status = false;
-                $info  = "Data is not listed successfully";
-            }
-            return ResponseBuilder::result($status, $info,$cuenta);
-        }else{
-            $status = false;
-            $info  = "Unauthorized";
+        if($request->isJson()){
+            $cuentas = DB::select("select * from modelo_cuenta where cliente_id = (select cliente_id from modelo_cliente where cedula = ". $cedula .");");
+
+            return response()->json($cuentas,200);
         }
-        return ResponseBuilder::result($status, $info,"sin datos");
+        return response()->json(['error'=>'Unauthorized'],401,[]);
     }
 
-    public function getCuenta(Request $request, $numero){
-        if($request->json()){
-            $cuenta = Cuenta::where('numero',$numero)->get();
-            //$cliente = Cliente::where('cedula',$cedula)->get();
-            if($cuenta != null){
-                $status = true;
-                $info  = "Data is listed successfully";
-            }else{
-                $status = false;
-                $info  = "Data is not listed successfully";
-            }
-            return ResponseBuilder::result($status, $info,$cuenta);
-        }else{
-            $status = false;
-            $info  = "Unauthorized";
+    public function create(Request $request){
+        if($request->isJson()){
+            $data = $request->json()->all();
+            $cliente = Cliente::create([
+                'cedula' => $data['cedula'],
+                'nombres' => $data['nombres'],
+                'apellidos' => $data['apellidos'],
+                'genero' => $data['genero'],
+                "estadoCivil" => $data['estadoCivil'],
+                "correo" => $data['correo'],
+                "telefono" => $data['telefono'],
+                "celular" => $data['celular'],
+                "direccion" => $data['direccion'],
+                //"date_created" => $data['date_created'],
+            ]);
+            return response()->json($data['cedula'],200);
         }
-        return ResponseBuilder::result($status, $info);
+        return response()->json(['error'=>'Unauthorized'],401,[]);
     }
-
-    public function realizarTransaccion(Request $request){
+/*
+    public function depositar(Request $request){
         if($request->json()){
-            $cuenta = Cuenta::where('numero',$request->numero)->get();
-            $transaccion = new Transaccion();
-            //$cliente = Cliente::where('cedula',$cedula)->get();
-            if($cuenta != null){
-                $transaccion->fecha = $request->fecha;
-                $transaccion->tipo = $request->tipo;
-                if($request->tipo == 'deposito'){
-                    $saldo = $cuenta[0]->saldo + $request->valor;
-                    $cuenta[0]->saldo = $saldo;
-                    $cuenta[0]->save();
-                }
-                $transaccion->valor = $request->valor;
-                $transaccion->descripcion = $request->descripcion;
-                $transaccion->responsable = $request->responsable;
-                $transaccion->cuenta_id = $cuenta[0]->cuenta_id;
-                $transaccion->save();
-                $status = true;
-                $info  = "Transaction was done";
-            }else{
-                $status = false;
-                $info  = "Data is not listed successfully";
-            }
-            return ResponseBuilder::result($status, $info,$transaccion);
-        }else{
-            $status = false;
-            $info  = "Unauthorized";
+            $cuenta = Cuenta::where('numero', $request->numero)->get();
+            
         }
-        return ResponseBuilder::result($status, $info);
     }
-
+*/
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-

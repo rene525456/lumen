@@ -15,17 +15,14 @@ $router->get('/', function () use ($router) {
     return $router->app->version();
 });
 
-$router->group(['prefix' => 'usuarios'], function($router){
-	$router->get('users','UserController@index');
-	$router->post('users','UserController@login');
+$router->group(['prefix' => 'cliente'], function($router){
+    $router->get('all','ClienteController@all');
+    $router->get('allJson','ClienteController@allJson');
+    $router->get('getCliente/{cedula}','ClienteController@getClienteCedula');
+    $router->get('getCuentas/{cedula}','ClienteController@getCuentas');
+    $router->post('create','ClienteController@create');
 });
 
-$router->group(['prefix' => 'cliente'], function($router){
-	$router->get('get/{cedula}','ClienteController@getCliente');
-	$router->get('cuentas/{cedula}','ClienteController@getCuentas');
-	$router->get('cuenta/{numero}','ClienteController@getCuenta');
-	$router->post('transaccion','ClienteController@realizarTransaccion');
-	$router->get('getPrueba/{cedula}','ClienteController@getClientePrueba');
-	
-	//$router->post('users','UserController@login');
+$router->group(['prefix' => 'transacciones'], function($router){
+    $router->post('depositar','TransaccionController@depositar');
 });
